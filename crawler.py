@@ -1,19 +1,13 @@
 import requests
-
-from file_io import save_results_csv
-from proxies import random_proxy
-from headers import random_headers
-import oda
+from helpers.file_io import save_results_csv, write_json_if_not_exists
+from helpers.proxies import random_proxy
+from helpers.headers import random_headers
+from parsers import oda
 import random
 from bs4 import BeautifulSoup
 import queue
+import os
 from threading import Thread
-
-starting_url = oda.starting_items_page()
-visited = set()
-max_visits = 10
-num_workers = 5
-data = {}
 
 
 def get_html(url):
@@ -42,49 +36,53 @@ def soup(html):
     return BeautifulSoup(html, "html.parser")
 
 
-def crawl(href, previous_href):
-    visited.add(href)
-    html = get_html(oda.url(href))
-    html_soup = soup(html)
-    if href[:15] == "/no/categories/":
-        links = oda.subcategories_soup(html_soup, href)
-        pages = oda.pages_soup(html_soup, href)
-        add_to_queue(pages, href)
-        if links:
-            random.shuffle(links)
-            add_to_queue(links, href)
-            return None
-        products = oda.products_soup(html_soup)
-        if products:
-            random.shuffle(products)
-            add_to_queue(products, href)
-            return None
-    elif href[:13] == "/no/products/":
-        add_product(oda.product_details_soup(html_soup, href, previous_href))
-        return None
-    else:
-        print("Reached unknown page: {}".format(href))
-
-
 def queue_worker(i, q):
     while True:
         current_url, previous_url = q.get()
         if len(visited) < max_visits and current_url not in visited:
-            crawl(current_url, previous_url)
+            crawl_oda(current_url, previous_url)
         q.task_done()
 
 
-q = queue.Queue()
-for i in range(num_workers):
-    Thread(target=queue_worker, args=(i, q), daemon=True).start()
+def crawl_oda(href, previous_href):
+    visited.add(href)
+    html = get_html(oda.url(href))
+    html_soup = soup(html)
+    is_product, var_1, var_2 = oda.scenario(href, previous_href, html_soup)
+    if is_product:
+        if save_flag:
+            location = "./results/scraped-data" + previous_href.replace("?page=", "page-")
+            os.makedirs(location, exist_ok=True)
+            write_json_if_not_exists(location + var_1.id + ".txt", var_1.get_as_dict())
+        add_product(var_1)
+    else:
+        random.shuffle(var_1)
+        add_to_queue(var_1, href)
+        add_to_queue(var_2, href)
 
-visited.add(starting_url)
-html = get_html(starting_url)
-categories = oda.categories_soup(soup(html))
-random.shuffle(categories)
-for category in categories[:1]:
-   q.put((category, starting_url))
-q.join()
 
-print('Done')
-save_results_csv("results_live.csv", data)
+def start_crawling_oda(visits=10, workers=5, flag=False):
+    global visited, max_visits, num_workers, save_flag, data, q
+    visited = set()
+    max_visits = visits
+    num_workers = workers
+    save_flag = flag
+    data = {}
+    q = queue.Queue()
+
+    for i in range(num_workers):
+        Thread(target=queue_worker, args=(i, q), daemon=True).start()
+
+    starting_url = oda.starting_items_page()
+    visited.add(starting_url)
+    html = get_html(starting_url)
+    categories = oda.categories(soup(html))
+    random.shuffle(categories)
+    for category in categories[:1]:
+        q.put((category, starting_url))
+    q.join()
+
+    save_results_csv("./results/results_live.csv", data)
+    print('Done')
+
+

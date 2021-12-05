@@ -22,5 +22,6 @@
     "Natrium": "sodium",
     "Egenskaper": "characteristics",
     "Ekstra mørt": "extra_tender",
-    "I tillegg trenger du": "requirements"
+    "I tillegg trenger du": "requirements",
+    "hvorav polyoler": "polyols"
 }

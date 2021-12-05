@@ -130,4 +130,5 @@ dmypy.json
 
 #HTML
 *.html
-/tutorial.py
+./scraped-data
+

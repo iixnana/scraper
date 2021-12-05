@@ -20,13 +20,22 @@ def save_results_csv(title, products_data):
     except IOError:
         print("I/O error")
 
+def read_text_file(file):
+    with open(file, 'r', encoding="utf-8") as file:
+        return file.readlines()
+
 def read_json(file):
-    with open(file, mode="r", encoding="utf-8") as json_file:
+    with open(file, "r", encoding="utf-8") as json_file:
         return json.load(json_file)
 
 def write_json(file, json_data):
     with open(file, 'w', encoding="utf-8") as outfile:
-        json.dump(json_data, outfile)
+        json.dump(json_data, outfile, indent=4)
+
+def write_json_if_not_exists(file, json_data):
+    if not Path(file).is_file():
+        with open(file, 'w', encoding="utf-8") as outfile:
+            json.dump(json_data, outfile, indent=4)
 
 csv_columns = [
     "id",
@@ -63,5 +72,6 @@ csv_columns = [
     "dietary fiber",
     "protein",
     "salt",
-    "sodium"
+    "sodium",
+    "polyols"
 ]
