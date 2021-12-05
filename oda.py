@@ -1,5 +1,9 @@
+# -*- coding: utf-8 -*-
+
 import requests
 import re
+import csv
+from product import Product
 from pathlib import Path
 from bs4 import BeautifulSoup
 
@@ -9,6 +13,17 @@ def save_html_file(title, path):
         page = requests.get(base_url + path)
         with open(full_file_name, 'wb+') as f:
             f.write(page.content)
+
+def save_as_csv(title, products_data):
+    csv_columns = ["id", "path", "title", "brand", "description", "currency", "price", "unit_price", "unit", "size", "delivery days", "ingredients", "origin", "supplier", "expiration", "nutrition data"]
+    try:
+        with open(title, 'w') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
+            writer.writeheader()
+            for data in products_data:
+                writer.writerow(data.get_as_dict())
+    except IOError:
+        print("I/O error")
 
 def get_categories(source):
     categories_href = []
@@ -43,18 +58,19 @@ def get_product_data(product):
     with open("product_example.html") as f:
         soup = BeautifulSoup(f, "html.parser")
         tables = soup.find_all('table')
-        output = []
+        output = {}
         for table in tables:
             for row in table.findAll('tr'):
                 new_row = []
                 for cell in row.findAll(['td', 'th']):
                     for sup in cell.findAll('sup'):
                         sup.extract()
+
                     for collapsible in cell.findAll(
                             class_='mw-collapsible-content'):
                         collapsible.extract()
                     new_row.append(cell.get_text().strip())
-                output.append(new_row)
+                output[new_row[0]] = new_row[1]
         print(output)
 
         description = soup.find("p", itemprop="description")
@@ -82,6 +98,13 @@ def get_product_data(product):
         print(unit)
         print(price)
         print(currency)
+        #nutrition = Nutrition()
+        product = Product(id, None, title, (brand_id, brand_title), description, currency, price, unit_price, unit, output["StÃ¸rrelse"], output["Utleveringsdager"], output["Ingredienser"], output["Opprinnelsesland"], output["LeverandÃ¸r"], output["Holdbarhetsgaranti"], output["Energi"], output["Energi"], output["Fett"],
+                              output["hvorav mettede fettsyrer"], output["hvorav enumettede fettsyrer"], output["hvorav flerumettede fettsyrer"],
+                              output["Karbohydrater"], output["hvorav sukkerarter"], output["Kostfiber"], output["Protein"], output["Salt"])
+        return product
+
+
 
 
 base_url = "https://oda.com"
@@ -113,4 +136,7 @@ products = []
 products, pg = get_products("category12sub0sub0.html")
 save_html_file("product_example", products[0])
 
-get_product_data("product_example.html")
+prods = []
+prods.append(get_product_data("product_example.html"))
+save_as_csv("results.csv", prods)
+
