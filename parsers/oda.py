@@ -12,7 +12,7 @@ def categories(soup):
 
 def subcategories(soup, href):
     subcategory_paths = []
-    for subcategory in soup.body.find_all("a", href=re.compile("^" + href + "(.|\s)*\S(.|\s)*")):
+    for subcategory in soup.body.find_all(href=re.compile("^" + href + "(.|\s)*\S(.|\s)*")):
         if not subcategory["href"] in subcategory_paths:
             subcategory_paths.append(subcategory["href"])
     return subcategory_paths
@@ -20,9 +20,13 @@ def subcategories(soup, href):
 
 def pages(soup, href):
     page_paths = []
-    for page in soup.body.find_all("a", href=re.compile("^\?page=")):
-        if not page["href"] == "?page=1":
+    pattern = "\?page="
+    for page in soup.body.find_all("a", href=re.compile("^\?page="), title="Neste side"):
+        if pattern not in href:
             page_paths.append(href + page["href"])
+        else:
+            ind = href.index(pattern)
+            page_paths.append(href[:ind]+page["href"])
     return page_paths
 
 
@@ -76,7 +80,10 @@ def extract_table_data(tables):
                         class_='mw-collapsible-content'):
                     collapsible.extract()
                 new_row.append(cell.get_text().strip())
-            product_data[dictionary[new_row[0]]] = new_row[1]
+            if new_row[0] in dictionary.keys():
+                product_data[dictionary[new_row[0]]] = new_row[1]
+            else:
+                file_io.append_line("./configurations/missing_keys.txt", new_row[0])
     return product_data
 
 
@@ -93,7 +100,7 @@ def url(href):
 
 
 def scenario(href, previous_href, soup):
-    if href[:15] == "/no/categories/":
+    if href.startswith("/no/categories/"):
         category_paths = subcategories(soup, href)
         page_paths = pages(soup, href)
         if category_paths:
@@ -101,10 +108,9 @@ def scenario(href, previous_href, soup):
         product_paths = products(soup)
         if product_paths:
             return False, product_paths, page_paths
-    elif href[:13] == "/no/products/":
+    elif href.startswith("/no/products/"):
         return True, product_details(soup, href, previous_href), None
-    else:
-        raise Exception("Reached unknown page: {}".format(href))
+    return None, None, None
 
 
 base_url = "https://oda.com"

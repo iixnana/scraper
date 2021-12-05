@@ -53,7 +53,7 @@ def crawl_oda(href, previous_href):
         if save_flag:
             location = "./results/scraped-data" + previous_href.replace("?page=", "page-")
             os.makedirs(location, exist_ok=True)
-            write_json_if_not_exists(location + var_1.id + ".txt", var_1.get_as_dict())
+            write_json_if_not_exists(location + var_1.id + ".txt", var_1.get_data())
         add_product(var_1)
     else:
         random.shuffle(var_1)

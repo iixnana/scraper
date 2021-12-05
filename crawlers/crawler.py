@@ -5,22 +5,26 @@ from bs4 import BeautifulSoup
 from abc import ABC, abstractmethod
 
 
-class crawler(ABC):
+def get_html(url):
+    try:
+        proxies = random_proxy()
+        headers = random_headers()
+        response = requests.get(url, headers=headers, proxies=proxies)
+        return response.content
+    except Exception as e:
+        print(e)
+        return ''
 
-    def get_html(self, url):
-        try:
-            proxies = random_proxy()
-            headers = random_headers()
-            response = requests.get(url, headers=headers, proxies=proxies)
-            return response.content
-        except Exception as e:
-            print(e)
-            return ''
+
+class Crawler(ABC):
 
     def add_to_queue(self, links, previous_href):
-        for link in links[:1]:
+        for link in links:
             if link not in self.visited:
                 self.q.put((link, previous_href))
+
+    def add_back_to_queue(self, current_href, previous_href):
+        self.q.put((current_href, previous_href))
 
     def add_product(self, product):
         if product.id not in self.data.keys():
@@ -33,35 +37,46 @@ class crawler(ABC):
         while True:
             current_url, previous_url = q.get()
             if len(self.visited) < self.max_visits and current_url not in self.visited:
-                self.crawl(current_url, previous_url)
+                self._crawl(current_url, previous_url)
+            q.task_done()
+
+    def queue_worker_all(self, i, q):
+        while True:
+            current_url, previous_url = q.get()
+            if current_url not in self.visited:
+                self._crawl(current_url, previous_url)
             q.task_done()
 
     @abstractmethod
-    def crawl(self, href, previous_href):
+    def _crawl(self, href, previous_href):
         pass
 
     @abstractmethod
-    def start_crawling(self, visits=10, workers=5, flag=False):
+    def start_crawling(self, visits, workers, flag, file):
         pass
 
-    @property
     @abstractmethod
-    def visited(self, val):
-        pass
-
-    @property
-    @abstractmethod
-    def max_visits(self, val):
+    def start_crawling_all(self, workers, flag, file):
         pass
 
     @property
     @abstractmethod
-    def num_workers(self, val):
+    def visited(self):
         pass
 
     @property
     @abstractmethod
-    def save_flag(self, val):
+    def max_visits(self):
+        pass
+
+    @property
+    @abstractmethod
+    def num_workers(self):
+        pass
+
+    @property
+    @abstractmethod
+    def save_flag(self):
         pass
 
     @property
@@ -71,6 +86,6 @@ class crawler(ABC):
 
     @property
     @abstractmethod
-    def q(self, val):
+    def q(self):
         pass
 

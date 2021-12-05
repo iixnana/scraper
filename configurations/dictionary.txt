@@ -23,5 +23,10 @@
     "Egenskaper": "characteristics",
     "Ekstra mørt": "extra_tender",
     "I tillegg trenger du": "requirements",
-    "hvorav polyoler": "polyols"
+    "hvorav polyoler": "polyols",
+    "hvorav stivelse": "starch",
+    "Informasjon": "information",
+    "Virkestoff": "active_substance",
+    "Volum": "volume",
+    "Grovhet": "roughness"
 }

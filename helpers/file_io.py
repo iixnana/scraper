@@ -16,13 +16,17 @@ def save_results_csv(title, products_data):
             writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
             writer.writeheader()
             for product in products_data.values():
-                writer.writerow(product.get_as_dict())
+                writer.writerow(product.get_data())
     except IOError:
         print("I/O error")
 
 def read_text_file(file):
     with open(file, 'r', encoding="utf-8") as file:
         return file.readlines()
+
+def append_line(file, line):
+    with open(file, "a", encoding="utf-8") as file_object:
+        file_object.write(line + "\n")
 
 def read_json(file):
     with open(file, "r", encoding="utf-8") as json_file:
@@ -62,16 +66,21 @@ csv_columns = [
     "extra_tender",
     "characteristics",
     "requirements",
-    "energy kj",
-    "energy kcal",
-    "saturated fatty acids",
-    "monounsaturated fatty acids",
-    "polyunsaturated fatty acids",
+    "energy_kj",
+    "energy_kcal",
+    "saturated_fatty_acids",
+    "monounsaturated_fatty_acids",
+    "polyunsaturated_fatty_acids",
     "carbohydrates",
     "sugars",
-    "dietary fiber",
+    "dietary_fiber",
     "protein",
     "salt",
     "sodium",
-    "polyols"
+    "polyols",
+    "starch",
+    "information",
+    "active_substance",
+    "volume",
+    "roughness"
 ]

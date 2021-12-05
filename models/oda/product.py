@@ -18,21 +18,23 @@ class Product:
             self.salt = get_value("salt", prod_data)
             self.sodium = get_value("sodium", prod_data)
             self.polyols = get_value("polyols", prod_data)
+            self.starch = get_value("starch", prod_data)
 
-        def get_as_dict(self):
+        def get_data(self):
             return {
-                "energy kj": self.energy_kj,
-                "energy kcal": self.energy_kcal,
-                "saturated fatty acids": self.saturated_fatty_acids,
-                "monounsaturated fatty acids": self.monounsaturated_fatty_acids,
-                "polyunsaturated fatty acids": self.polyunsaturated_fatty_acids,
+                "energy_kj": self.energy_kj,
+                "energy_kcal": self.energy_kcal,
+                "saturated_fatty_acids": self.saturated_fatty_acids,
+                "monounsaturated_fatty_acids": self.monounsaturated_fatty_acids,
+                "polyunsaturated_fatty_acids": self.polyunsaturated_fatty_acids,
                 "carbohydrates": self.carbohydrates,
                 "sugars": self.sugars,
-                "dietary fiber": self.dietary_fiber,
+                "dietary_fiber": self.dietary_fiber,
                 "protein": self.protein,
                 "salt": self.salt,
                 "sodium": self.sodium,
-                "polyols": self.polyols
+                "polyols": self.polyols,
+                "starch": self.starch
             }
 
     def __init__(self, prod_data):
@@ -60,10 +62,14 @@ class Product:
         self.characteristics = get_value("characteristics", prod_data)
         self.extra_tender = get_value("extra_tender", prod_data)
         self.requirements = get_value("requirements", prod_data)
+        self.information = get_value("information", prod_data)
+        self.active_substance = get_value("active_substance", prod_data)
+        self.volume = get_value("volume", prod_data)
+        self.roughness = get_value("roughness", prod_data)
         self.nutrition_data = self.Nutrition(prod_data)
 
-    def get_as_dict(self):
-        nutrition_data = self.nutrition_data.get_as_dict()
+    def get_data(self):
+        nutrition_data = self.nutrition_data.get_data()
         prod_data = {
             "id": self.id,
             "category": self.category,
@@ -88,8 +94,9 @@ class Product:
             "variable_weight": self.variable_weight,
             "extra_tender": self.extra_tender,
             "characteristics": self.characteristics,
-            "requirements": self.requirements
-        }
-        for key in nutrition_data.keys():
-            prod_data[key] = nutrition_data[key]
+            "requirements": self.requirements,
+            "information": self.information,
+            "volume": self.volume,
+            "roughness": self.roughness
+        } | nutrition_data
         return prod_data
