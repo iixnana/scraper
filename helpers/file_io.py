@@ -12,7 +12,7 @@ def save_html_file(title, url):
 
 def save_results_csv(title, products_data):
     try:
-        with open(title, 'w', encoding="utf-8") as csvfile:
+        with open(title, 'w', encoding="utf-8", newline='') as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
             writer.writeheader()
             for product in products_data.values():
