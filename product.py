@@ -1,25 +1,23 @@
+from dict_value import get_value, get_list
+
 
 class Product:
+
     class Nutrition:
-
-        def __init__(self, energy_kj, energy_kcal, fat, saturated_fatty_acids, monounsaturated_fatty_acids,
-                     polyunsaturated_fatty_acids, carbohydrates, sugars, dietary_fiber, protein, sodium):
-            self.energy_kj = energy_kj
-            self.energy_kcal = energy_kcal
-            self.fat = fat
-            self.saturated_fatty_acids = saturated_fatty_acids
-            self.monounsaturated_fatty_acids = monounsaturated_fatty_acids
-            self.polyunsaturated_fatty_acids = polyunsaturated_fatty_acids
-            self.carbohydrates = carbohydrates
-            self.sugars = sugars
-            self.dietary_fiber = dietary_fiber
-            self.protein = protein
-            self.sodium = sodium
-
-        def get_as_list(self):
-            return [self.energy_kj, self.energy_kcal, self.saturated_fatty_acids, self.monounsaturated_fatty_acids,
-                    self.polyunsaturated_fatty_acids, self.carbohydrates, self.sugars, self.dietary_fiber, self.protein,
-                    self.sodium]
+        def __init__(self, output):
+            energy_kj, energy_kcal = get_list("energy", output, "/\n")
+            self.energy_kj = energy_kj.strip() if energy_kj is not None else None
+            self.energy_kcal = energy_kcal.strip() if energy_kcal is not None else None
+            self.fat = get_value("fat", output)
+            self.saturated_fatty_acids = get_value("saturated_fatty_acids", output)
+            self.monounsaturated_fatty_acids = get_value("monounsaturated_fatty_acids", output)
+            self.polyunsaturated_fatty_acids = get_value("polyunsaturated_fatty_acids", output)
+            self.carbohydrates = get_value("carbohydrates", output)
+            self.sugars = get_value("sugars", output)
+            self.dietary_fiber = get_value("dietary_fiber", output)
+            self.protein = get_value("protein", output)
+            self.salt = get_value("salt", output)
+            self.sodium = get_value("sodium", output)
 
         def get_as_dict(self):
             return {
@@ -32,40 +30,46 @@ class Product:
                 "sugars": self.sugars,
                 "dietary fiber": self.dietary_fiber,
                 "protein": self.protein,
+                "salt": self.salt,
                 "sodium": self.sodium
             }
 
-    def __init__(self, id, path, title, brand, description, currency, price, unit_price, unit, size, delivery_days, ingredients, origin, supplier, expiration, energy_kj, energy_kcal, fat,
-                              saturated_fatty_acids, monounsaturated_fatty_acids,polyunsaturated_fatty_acids,
-                              carbohydrates, sugars, dietary_fiber, protein, sodium):
+    def __init__(self, id, category, path, title, extra_details, brand, description, currency, price, unit_price, unit,
+                 output):
         self.id = id
+        self.category = category
         self.path = path
         self.title = title
+        self.extra_details = extra_details
         self.brand = brand
         self.description = description
         self.currency = currency
         self.price = price
         self.unit_price = unit_price
         self.unit = unit
-        self.size = size
-        self.delivery_days = delivery_days
-        self.ingredients = ingredients
-        self.origin = origin
-        self.supplier = supplier
-        self.expiration = expiration
-        self.nutrition_data = self.Nutrition(energy_kj, energy_kcal, fat,
-                              saturated_fatty_acids, monounsaturated_fatty_acids, polyunsaturated_fatty_acids,
-                              carbohydrates, sugars, dietary_fiber, protein, sodium)
-
-    def get_as_list(self):
-        return [self.id, self.path, self.title, self.brand, self.description, self.currency, self.price, self.unit_price, self.unit, self.size, self.delivery_days, self.ingredients, self.origin, self.supplier, self.expiration, self.nutrition_data]
+        self.size = get_value("size", output)
+        self.delivery_days = get_value("delivery_days", output)
+        self.ingredients = get_value("ingredients", output)
+        self.country_of_origin = get_value("country_of_origin", output)
+        self.place_of_origin = get_value("place_of_origin", output)
+        self.supplier = get_value("supplier", output)
+        self.expiration = get_value("expiration", output)
+        self.pant = get_value("pant", output)
+        self.storage = get_value("storage", output)
+        self.variable_weight = get_value("variable_weight", output)
+        self.characteristics = get_value("characteristics", output)
+        self.extra_tender = get_value("extra_tender", output)
+        self.requirements = get_value("requirements", output)
+        self.nutrition_data = self.Nutrition(output)
 
     def get_as_dict(self):
-        self.nutrition_data.get_as_dict()
-        return {
+        nutrition_data = self.nutrition_data.get_as_dict()
+        prod_data = {
             "id": self.id,
+            "category": self.category,
             "path": self.path,
             "title": self.title,
+            "extra_details": self.extra_details,
             "brand": self.brand,
             "description": self.description,
             "currency": self.currency,
@@ -73,12 +77,21 @@ class Product:
             "unit_price": self.unit_price,
             "unit": self.unit,
             "size": self.size,
-            "delivery days": self.delivery_days,
+            "delivery_days": self.delivery_days,
             "ingredients": self.ingredients,
-            "origin": self.origin,
+            "country_of_origin": self.country_of_origin,
+            "place_of_origin": self.place_of_origin,
             "supplier": self.supplier,
             "expiration": self.expiration,
-            "nutrition data": self.nutrition_data.get_as_dict()
+            #"nutrition data": self.nutrition_data.get_as_dict(),
+            "pant": self.pant,
+            "storage": self.storage,
+            "variable_weight": self.variable_weight,
+            "extra_tender": self.extra_tender,
+            "characteristics": self.characteristics,
+            "requirements": self.requirements
         }
-
+        for key in nutrition_data.keys():
+            prod_data[key] = nutrition_data[key]
+        return prod_data
 
