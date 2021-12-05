@@ -25,7 +25,7 @@ def oda_crawl_limited(v, w, s, r):
 @click.option('--w', '--workers', type=int, default=5, help="provide amount of workers for parallel queues")
 @click.option('--s', '--save', type=bool, is_flag=True, default=False, help="save JSON files")
 @click.option('--r', '--file', type=str, default="results_random_cat.csv", help="results file name")
-def oda_crawl_limited(v, w, s, r):
+def oda_crawl_random_limited(v, w, s, r):
     """Crawling Oda.com. Limited amount of visits."""
     Oda().start_crawling_random_category(v, w, s, r)
 
