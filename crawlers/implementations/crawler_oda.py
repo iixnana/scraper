@@ -1,6 +1,6 @@
 from helpers.file_io import save_results_csv, write_json_if_not_exists, create_all_results_file, append_product_csv, \
     write_text_file
-from crawlers.parsers import parser_oda as parser
+from crawlers.implementations import parser_oda as parser
 import random
 import queue
 import os

@@ -1,6 +1,6 @@
 import os
 import click
-from crawlers.parsers.crawler_oda import Oda
+from crawlers.implementations.crawler_oda import Oda
 from helpers.file_io import read_text_file
 from helpers.proxies import get_new_proxies
 
