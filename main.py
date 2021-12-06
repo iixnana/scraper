@@ -49,7 +49,7 @@ def oda_crawl_cat(category, w, s, r):
     Oda().start_crawling_in_category(category, w, s, r)
 
 
-@cli.command(name='oda-categories', short_help="start crawling of Oda.com; specific category")
+@cli.command(name='oda-categories', short_help="start crawling of Oda.com; get all initial categories")
 def oda_crawl_cat():
     """Crawling Oda.com. Scrape starting categories."""
     Oda().get_categories()
