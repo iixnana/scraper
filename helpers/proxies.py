@@ -11,6 +11,7 @@ def get_new_proxies():
     for proxy in soup.find("textarea").text[75:].strip().split("\n"):
         proxies_list.append({"http": "http://" + proxy})
     write_json(title, proxies_list)
+    print("Proxies have been updated.")
 
 
 def random_proxy():

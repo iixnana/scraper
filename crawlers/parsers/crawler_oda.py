@@ -1,8 +1,10 @@
-from helpers.file_io import save_results_csv, write_json_if_not_exists
-from parsers import oda as parser
+from helpers.file_io import save_results_csv, write_json_if_not_exists, create_all_results_file, append_product_csv, \
+    write_text_file
+from crawlers.parsers import parser_oda as parser
 import random
 import queue
 import os
+import time
 from threading import Thread
 from crawlers.crawler import Crawler, get_html
 
@@ -23,6 +25,22 @@ class Oda(Crawler):
                 os.makedirs(location, exist_ok=True)
                 write_json_if_not_exists(location + var_1.id + ".txt", var_1.get_data())
             super().add_product(var_1)
+        else:
+            random.shuffle(var_1)
+            super().add_to_queue(var_1, href)
+            super().add_to_queue(var_2, href)
+
+    def _crawl_all(self, href, previous_href):
+        self.visited.add(href)
+        time.sleep(1)
+        html = get_html(parser.url(href))
+        html_soup = super().soup(html)
+        is_product, var_1, var_2 = parser.scenario(href, previous_href, html_soup)
+        if is_product is None and var_1 is None and var_2 is None:
+            self.visited.discard(href)
+            super().add_back_to_queue(href, previous_href)
+        elif is_product:
+            append_product_csv(self.results_file, var_1)
         else:
             random.shuffle(var_1)
             super().add_to_queue(var_1, href)
@@ -82,9 +100,11 @@ class Oda(Crawler):
         self.save_flag = flag
         self.data = {}
         self.q = queue.Queue()
+        self.results_file = "./results/" + results_file
+        create_all_results_file(self.results_file)
 
         for i in range(self.num_workers):
-            Thread(target=super().queue_worker_all, args=(i, self.q), daemon=True).start()
+            Thread(target=super().queue_worker_all_save, args=(i, self.q), daemon=True).start()
 
         starting_url = parser.starting_items_page()
         self.visited.add(starting_url)
@@ -95,8 +115,6 @@ class Oda(Crawler):
             self.q.put((category, starting_url))
         self.q.join()
 
-        results_file = "./results/" + results_file
-        save_results_csv(results_file, self.data)
         print('Crawling is completed. Find results at {}'.format(results_file))
         print("Visited: {}".format(self.visited))
 
@@ -128,7 +146,10 @@ class Oda(Crawler):
         starting_url = parser.starting_items_page()
         self.visited.add(starting_url)
         html = get_html(starting_url)
-        print(parser.categories(super().soup(html)))
+        categories = parser.categories(super().soup(html))
+        for category in categories:
+            print(category)
+        write_text_file("categories.txt", categories)
 
     visited = set()
     max_visits = 10
@@ -136,3 +157,4 @@ class Oda(Crawler):
     save_flag = False
     data = {}
     q = queue.Queue()
+    results_file = ""

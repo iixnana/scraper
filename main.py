@@ -1,6 +1,6 @@
 import os
 import click
-from crawlers.oda import Oda
+from crawlers.parsers.crawler_oda import Oda
 from helpers.file_io import read_text_file
 from helpers.proxies import get_new_proxies
 
@@ -47,6 +47,12 @@ def oda_crawl_unlimited(w, s, r):
 def oda_crawl_cat(category, w, s, r):
     """Crawling Oda.com. Scrape products from whole category."""
     Oda().start_crawling_in_category(category, w, s, r)
+
+
+@cli.command(name='oda-categories', short_help="start crawling of Oda.com; specific category")
+def oda_crawl_cat():
+    """Crawling Oda.com. Scrape starting categories."""
+    Oda().get_categories()
 
 
 @cli.command(name='update-proxies', short_help="get new proxies")

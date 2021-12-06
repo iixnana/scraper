@@ -47,8 +47,19 @@ class Crawler(ABC):
                 self._crawl(current_url, previous_url)
             q.task_done()
 
+    def queue_worker_all_save(self, i, q):
+        while True:
+            current_url, previous_url = q.get()
+            if current_url not in self.visited:
+                self._crawl_all(current_url, previous_url)
+            q.task_done()
+
     @abstractmethod
     def _crawl(self, href, previous_href):
+        pass
+
+    @abstractmethod
+    def _crawl_all(self, href, previous_href):
         pass
 
     @abstractmethod

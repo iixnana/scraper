@@ -3,12 +3,14 @@ from pathlib import Path
 import requests
 import csv
 
+
 def save_html_file(title, url):
     full_file_name = title + ".html"
     if not Path(full_file_name).is_file():
         page = requests.get(url)
         with open(full_file_name, 'wb+', encoding="utf-8") as f:
             f.write(page.content)
+
 
 def save_results_csv(title, products_data):
     try:
@@ -20,26 +22,56 @@ def save_results_csv(title, products_data):
     except IOError:
         print("I/O error")
 
+
+def create_all_results_file(title):
+    try:
+        with open(title, 'w', encoding="utf-8", newline='') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
+            writer.writeheader()
+    except IOError:
+        print("I/O error")
+
+
+def append_product_csv(title, product):
+    try:
+        with open(title, 'a', encoding="utf-8", newline='') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
+            writer.writerow(product.get_data())
+    except IOError:
+        print("I/O error")
+
+
 def read_text_file(file):
     with open(file, 'r', encoding="utf-8") as file:
         return file.readlines()
+
+
+def write_text_file(file, data):
+    with open("./results/" + file, 'w', encoding="utf-8") as outfile:
+        for line in data:
+            outfile.write(line + "\n")
+
 
 def append_line(file, line):
     with open(file, "a", encoding="utf-8") as file_object:
         file_object.write(line + "\n")
 
+
 def read_json(file):
     with open(file, "r", encoding="utf-8") as json_file:
         return json.load(json_file)
+
 
 def write_json(file, json_data):
     with open(file, 'w', encoding="utf-8") as outfile:
         json.dump(json_data, outfile, indent=4)
 
+
 def write_json_if_not_exists(file, json_data):
     if not Path(file).is_file():
         with open(file, 'w', encoding="utf-8") as outfile:
             json.dump(json_data, outfile, indent=4)
+
 
 csv_columns = [
     "id",

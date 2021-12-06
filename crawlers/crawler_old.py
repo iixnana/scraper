@@ -2,7 +2,7 @@ import requests
 from helpers.file_io import save_results_csv, write_json_if_not_exists
 from helpers.proxies import random_proxy
 from helpers.headers import random_headers
-from parsers import oda
+from parsers import parser_oda
 import random
 from bs4 import BeautifulSoup
 import queue
