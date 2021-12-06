@@ -1,6 +1,6 @@
 # Purpose
 Web crawler used for product scraping from e-commerce website. Solved engineering case, based on CLI. Run <i>main.py</i> for more information.
-###Functions
+# Functions
 * Scrape all data (warning: takes a lot of time)
 * Scrape limited amount of data (limiting amount of URLs which are going to be visited)
 * Scrape one specified category
